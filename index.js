@@ -27,7 +27,19 @@ async function run() {
       res.send(result);
     });
 
-    app.delete("/task/:id", verifyJWT, verifyAdmin, async (req, res) => {
+    app.patch("/task/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const updatedDoc = {
+        $set: {
+          completed: true,
+        },
+      };
+      const updated = await taskCollection.updateOne(filter, updatedDoc);
+      res.send(updated);
+    });
+
+    app.delete("/task/:id", async (req, res) => {
       const id = req.params.id;
       const filter = { _id: ObjectId(id) };
       const result = await taskCollection.deleteOne(filter);
