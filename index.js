@@ -21,6 +21,13 @@ async function run() {
     await client.connect();
     const taskCollection = client.db("simple_to_do_app").collection("tasks");
 
+    app.get("/task/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const result = await taskCollection.find(query).toArray();
+      res.send(result);
+    });
+
     app.post("/task", async (req, res) => {
       const task = req.body;
       const result = await taskCollection.insertOne(task);
@@ -29,11 +36,11 @@ async function run() {
 
     app.patch("/task/:id", async (req, res) => {
       const id = req.params.id;
+      const completed = req.body;
       const filter = { _id: ObjectId(id) };
+
       const updatedDoc = {
-        $set: {
-          completed: true,
-        },
+        $set: completed,
       };
       const updated = await taskCollection.updateOne(filter, updatedDoc);
       res.send(updated);
